@@ -1,0 +1,55 @@
+{
+	"family": "frontend-backend-demo_frontend-express",
+	"networkMode": "awsvpc",
+	"containerDefinitions": [{
+			"essential": true,
+			"image": "amazon/aws-for-fluent-bit:latest",
+			"name": "log_router",
+			"firelensConfiguration": {
+				"type": "fluentbit",
+				"options": {
+					"enable-ecs-log-metadata": "true"
+				}
+            },
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                  "awslogs-group": "frontend-backend-demo",
+                  "awslogs-region": "us-east-1",
+                  "awslogs-stream-prefix": "fluentbit_frontend-express"
+                }
+              }
+		},
+		{
+			"essential": true,
+			"name": "frontend-backend-demo_frontend-express",
+			"image": "876614805374.dkr.ecr.us-east-1.amazonaws.com/frontend-backend-demo_frontend-express:latest",
+			"cpu": 512,
+			"memoryReservation": 1024,
+			"portMappings": [{
+				"containerPort": 5000
+			}],
+			"environment": [{
+				"name": "BACKEND_SERVICE",
+				"value": "http://backend-flask.local:5000/backend"
+			}],
+			"logConfiguration": {
+				"logDriver": "awsfirelens",
+				"options": {
+					"Name": "cloudwatch",
+					"region": "us-east-1",
+					"log_group_name": "frontend-backend-demo",
+					"auto_create_group": "true",
+					"log_stream_prefix": "frontend-express"
+				}
+			}
+		}
+	],
+    "executionRoleArn": "arn:aws:iam::876614805374:role/ecsTaskExecutionRole",
+    "taskRoleArn": "arn:aws:iam::876614805374:role/ecsTaskExecutionRole",
+	"requiresCompatibilities": [
+		"FARGATE"
+	],
+	"cpu": "1 vcpu",
+	"memory": "2 gb"
+}
