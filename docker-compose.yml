@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  backend-flask:
+    build: ./backend-flask
+    ports:
+      - "5000:5000"
+    restart: always
+    environment:
+      - VERSION=V1
+
+  frontend-express:
+    depends_on:
+      - backend-flask
+    build: ./frontend-express
+    restart: always
+    ports:
+      - "8080:8080"
+    restart: always
+    environment:
+    - BACKEND_SERVICE=http://backend-flask:5000/backend
+    - PORT=8080
+
