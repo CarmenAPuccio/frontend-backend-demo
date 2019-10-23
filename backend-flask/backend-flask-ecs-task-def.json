@@ -1,0 +1,100 @@
+{
+	"family": "frontend-backend-demo_backend-flask",
+	"networkMode": "awsvpc",
+	"containerDefinitions": [{
+			"essential": true,
+			"image": "876614805374.dkr.ecr.us-east-1.amazonaws.com/frontend-backend-demo_aws-for-fluent-bit-custom:latest",
+			"name": "log_router",
+			"firelensConfiguration": {
+				"type": "fluentbit",
+				"options": {
+					"enable-ecs-log-metadata": "true",
+					"config-file-type": "file",
+					"config-file-value": "/fluent-bit/parsers/nginx_parser.conf"
+				}
+			},
+			"logConfiguration": {
+				"logDriver": "awslogs",
+				"options": {
+					"awslogs-group": "backend-flask",
+					"awslogs-region": "us-east-1",
+					"awslogs-stream-prefix": "fluentbit"
+				}
+			},
+			"memoryReservation": 50
+		},
+		{
+			"name": "flask",
+			"image": "876614805374.dkr.ecr.us-east-1.amazonaws.com/frontend-backend-demo_backend-flask:latest",
+			"portMappings": [{
+				"containerPort": 5000
+			}],
+			"essential": true,
+			"environment": [{
+				"name": "VERSION",
+				"value": "V1"
+			}],
+			"healthCheck": {
+				"command": ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:5000"],
+				"interval": 30,
+				"timeout": 5,
+				"retries": 5,
+				"startPeriod": 30
+			},
+			"logConfiguration": {
+				"logDriver": "awsfirelens",
+				"options": {
+					"Name": "cloudwatch",
+					"region": "us-east-1",
+					"log_group_name": "backend-flask",
+					"auto_create_group": "true",
+					"log_stream_prefix": "flask"
+				}
+			}
+		},
+		{
+			"name": "nginx-proxy",
+			"image": "876614805374.dkr.ecr.us-east-1.amazonaws.com/frontend-backend-demo_backend-nginx-proxy:latest",
+			"portMappings": [{
+				"containerPort": 80
+			}],
+			"essential": true,
+			"environment": [
+				{
+					"name": "BACKEND_FLASK_HOST",
+					"value": "localhost"
+				},
+				{
+					"name": "BACKEND_FLASK_PORT",
+					"value": "5000"
+				}
+			],
+			"dependsOn": [{
+				"containerName": "flask",
+				"condition": "HEALTHY"
+			}],
+			"logConfiguration": {
+				"logDriver": "awsfirelens",
+				"options": {
+					"Name": "cloudwatch",
+					"region": "us-east-1",
+					"log_group_name": "backend-flask",
+					"auto_create_group": "true",
+					"log_stream_prefix": "nginx-proxy"
+				}
+			},
+			"command": [
+				"/bin/bash",
+				"-c",
+				"envsubst < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
+			]
+		}
+	],
+	"executionRoleArn": "arn:aws:iam::876614805374:role/ecsTaskExecutionRole",
+	"taskRoleArn": "arn:aws:iam::876614805374:role/ecsTaskExecutionRole",
+	"requiresCompatibilities": [
+		"FARGATE"
+	],
+	"cpu": "1 vcpu",
+	"memory": "2 gb"
+}
