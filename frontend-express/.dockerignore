@@ -8,3 +8,4 @@ docker-compose*
 README.md
 LICENSE
 .vscode
+frontend-express-ecs-task-def.json
