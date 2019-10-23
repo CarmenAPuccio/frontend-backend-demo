@@ -1,6 +1,12 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
-  a(href='/backend') Checkout the backend service!
+  .View.WelcomeView
+    .View
+      h1.Banner #{title}
+      .Message
+        .Title
+          h3 Check out the Backend Service!
+      .NavButtons
+        a(href='/backend') 
+          div.NavButton Backend

@@ -1,7 +1,12 @@
+
+block variables
 doctype html
 html
   head
-    title= title
+    meta(charset="utf-8")
+    link(rel="icon", href="/images/favicon.ico")
+    #{title}
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    block content
+    div#root
+      block content
