@@ -30,7 +30,7 @@
 			"cpu": 512,
 			"memoryReservation": 1024,
 			"portMappings": [{
-				"containerPort": 5000
+				"containerPort": 8080
 			}],
 			"environment": [{
 				"name": "BACKEND_SERVICE",
