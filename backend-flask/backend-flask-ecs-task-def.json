@@ -10,7 +10,7 @@
 				"options": {
 					"enable-ecs-log-metadata": "true",
 					"config-file-type": "file",
-					"config-file-value": "/fluent-bit/parsers/nginx_parser.conf"
+					"config-file-value": "/fluent-bit/conf/parse_nginx.conf"
 				}
 			},
 			"logConfiguration": {
