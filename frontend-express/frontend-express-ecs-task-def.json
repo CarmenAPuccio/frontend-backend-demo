@@ -3,14 +3,14 @@
 	"networkMode": "awsvpc",
 	"containerDefinitions": [{
 			"essential": true,
-			"image": "amazon/aws-for-fluent-bit:latest",
+			"image": "876614805374.dkr.ecr.us-east-1.amazonaws.com/frontend-backend-demo_aws-for-fluent-bit-custom:latest",
 			"name": "log_router",
 			"firelensConfiguration": {
 				"type": "fluentbit",
 				"options": {
 					"enable-ecs-log-metadata": "true",
 					"config-file-type": "file",
-					"config-file-value": "/fluent-bit/configs/parse-json.conf"
+					"config-file-value": "/fluent-bit/conf/parse_pino.conf"
 				}
             },
             "logConfiguration": {
