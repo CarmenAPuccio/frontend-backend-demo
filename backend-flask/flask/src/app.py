@@ -4,6 +4,7 @@ import time
 import os
 from flask import Flask, request, json
 from dotenv import load_dotenv
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 load_dotenv()
 
@@ -11,6 +12,8 @@ load_dotenv()
 host_name = socket.gethostname()
 
 app = Flask(__name__)
+
+app.wsgi_app = ProxyFix(app.wsgi_app, num_proxies=2)
 
 @app.route('/')
 def hello():
